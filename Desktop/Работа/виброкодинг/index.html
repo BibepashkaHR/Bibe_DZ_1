@@ -114,6 +114,36 @@
                 transform: translate(var(--tx), var(--ty)) scale(0);
             }
         }
+
+        /* Анимация для эмодзи цветов */
+        .flower-emoji {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .flower-emoji:hover {
+            transform: scale(1.1);
+        }
+
+        .flower-emoji.popping {
+            animation: popAndDisappear 0.5s ease-in forwards;
+        }
+
+        @keyframes popAndDisappear {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -138,13 +168,28 @@
         </div>
         
         <div class="flowers">
-            🌹 <span class="heart">❤️</span> 🌷 🌸 🌺
+            <span class="flower-emoji" data-flower="🌹">🌹</span>
+            <span class="heart">❤️</span>
+            <span class="flower-emoji" data-flower="🌷">🌷</span>
+            <span class="flower-emoji" data-flower="🌸">🌸</span>
+            <span class="flower-emoji" data-flower="🌺">🌺</span>
         </div>
     </div>
     
     <script>
+        // Счётчик лопнутых цветов
+        let poppedCount = 0;
+        const totalFlowers = 5;
+
         // Обработчик клика для эффекта фейерверка
         document.addEventListener('click', function(e) {
+            // Проверяем, кликнули ли по цветку
+            if (e.target.classList.contains('flower-emoji')) {
+                e.stopPropagation();
+                popFlower(e.target);
+                return;
+            }
+
             // Получаем координаты клика с учётом прокрутки страницы
             const x = e.clientX;
             const y = e.clientY + window.scrollY;
@@ -204,6 +249,38 @@
             setTimeout(() => {
                 particle.remove();
             }, 1000);
+        }
+
+        // Функция "лопания" цветка
+        function popFlower(element) {
+            // Если уже лопнул, игнорируем
+            if (element.classList.contains('popped')) {
+                return;
+            }
+
+            // Добавляем класс анимации
+            element.classList.add('popping', 'popped');
+            poppedCount++;
+
+            // Удаляем эмодзи после завершения анимации
+            setTimeout(() => {
+                element.style.visibility = 'hidden';
+                
+                // Если все цветы лопнуты, восстанавливаем их
+                if (poppedCount >= totalFlowers) {
+                    setTimeout(resetFlowers, 500);
+                }
+            }, 500);
+        }
+
+        // Функция восстановления всех цветов
+        function resetFlowers() {
+            const flowers = document.querySelectorAll('.flower-emoji');
+            flowers.forEach(flower => {
+                flower.classList.remove('popping', 'popped');
+                flower.style.visibility = 'visible';
+            });
+            poppedCount = 0;
         }
     </script>
 </body>
