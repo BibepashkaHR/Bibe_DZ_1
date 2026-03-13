@@ -114,19 +114,6 @@
                 transform: translate(var(--tx), var(--ty)) scale(0);
             }
         }
-
-        /* Анимация увеличения и лопания */
-        .pop-image {
-            position: fixed;
-            pointer-events: none;
-            z-index: 10000;
-            transition: transform 0.6s ease-in, opacity 0.2s ease-out;
-        }
-
-        .pop-image.popping {
-            transform: scale(5);
-            opacity: 0;
-        }
     </style>
 </head>
 <body>
@@ -151,24 +138,13 @@
         </div>
         
         <div class="flowers">
-            <span class="pop-image" data-emoji="🌹">🌹</span>
-            <span class="heart">❤️</span>
-            <span class="pop-image" data-emoji="🌷">🌷</span>
-            <span class="pop-image" data-emoji="🌸">🌸</span>
-            <span class="pop-image" data-emoji="🌺">🌺</span>
+            🌹 <span class="heart">❤️</span> 🌷 🌸 🌺
         </div>
     </div>
     
     <script>
         // Обработчик клика для эффекта фейерверка
         document.addEventListener('click', function(e) {
-            // Проверяем, кликнули ли по картинке с pop-image
-            if (e.target.classList.contains('pop-image')) {
-                e.stopPropagation();
-                popFlower(e.target);
-                return;
-            }
-
             // Получаем координаты клика с учётом прокрутки страницы
             const x = e.clientX;
             const y = e.clientY + window.scrollY;
@@ -228,51 +204,6 @@
             setTimeout(() => {
                 particle.remove();
             }, 1000);
-        }
-
-        // Функция анимации "лопания" цветка
-        function popFlower(element) {
-            // Получаем эмодзи из data-атрибута
-            const emoji = element.getAttribute('data-emoji');
-            
-            // Получаем координаты контейнера для определения стороны
-            const container = document.querySelector('.container');
-            const containerRect = container.getBoundingClientRect();
-            const elementRect = element.getBoundingClientRect();
-            
-            // Случайно выбираем сторону: слева (true) или справа (false)
-            const leftSide = Math.random() < 0.5;
-            
-            // Вычисляем позицию для увеличенной копии
-            // X: слева или справа от открытки
-            const xPos = leftSide 
-                ? containerRect.left - 100 
-                : containerRect.right + 100;
-            // Y: по центру элемента
-            const yPos = elementRect.top + elementRect.height / 2;
-            
-            // Создаём копию эмодзи для анимации
-            const popCopy = document.createElement('span');
-            popCopy.textContent = emoji;
-            popCopy.classList.add('pop-image');
-            popCopy.style.fontSize = '3rem';
-            popCopy.style.left = xPos + 'px';
-            popCopy.style.top = yPos + 'px';
-            popCopy.style.transform = 'translate(-50%, -50%) scale(1)';
-            
-            document.body.appendChild(popCopy);
-            
-            // Запускаем анимацию увеличения и исчезновения
-            requestAnimationFrame(() => {
-                popCopy.style.transition = 'transform 0.6s ease-in, opacity 0.2s ease-out';
-                popCopy.style.transform = `translate(-50%, -50%) scale(5)`;
-                popCopy.style.opacity = '0';
-            });
-            
-            // Удаляем копию после завершения анимации
-            setTimeout(() => {
-                popCopy.remove();
-            }, 800);
         }
     </script>
 </body>
